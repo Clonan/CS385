@@ -13,16 +13,26 @@ function init() {
     Sun = new Sphere();
     Earth = new Sphere();
     Moon = new Sphere();
+    Saturn = new Sphere();
+    Saturn.color = [1,0.7,0,1];
+
+    Saturn.radius=58232*5; //5x Size for consistency
+    Saturn.orbit=1400000000/250; //1/250 Size for visibility
+
+    SaturnRing = new Disk(20, 0.7);
+    SaturnRing.color = [1,0.8,0,1];
+
+    SaturnRing.radius=62120*8; //5x Size for consistency
 
     Sun.radius=695508;
     Sun.color = [1,1,0,1];
-    Earth.radius=6371*10; //10x Size for visibility
+    Earth.radius=6371*20; //10x Size for visibility
     Earth.orbit=150000000/50; //1/50 Size for visibility
     Earth.color = [0,1,0,1];
-    Moon.radius=1738*10; //10x Size for visibility
-    Moon.orbit=382500/2; //1/2 Size for scale
+    Moon.radius=1738*20; //10x Size for visibility
+    Moon.orbit=382500; //1/2 Size for scale
     Moon.color = [0.8, 0.8, 0.8, 1];
-    D=2*Earth.orbit+Moon.orbit+Moon.radius;
+    D=2*Earth.orbit+Moon.orbit+Saturn.radius+Saturn.orbit;
     near=D*4;
     far=near+D;
     fov=2/Math.tan(Math.atan((D/2)/(near+D/2)));
@@ -30,6 +40,8 @@ function init() {
     Sun.P = perspective(fov,1,near,far);
     Earth.P = perspective(fov,1,near,far);
     Moon.P = perspective(fov,1,near,far);
+    Saturn.P = perspective(fov,1,near,far);
+    SaturnRing.P = perspective(fov,1,near,far);
 
     requestAnimationFrame(render);
 }
@@ -48,25 +60,36 @@ function render() {
     ms.load(V);
 
     ms.push();
-    ms.scale(Sun.radius);
-    ms.translate(0,0,0);
-    Sun.MV = ms.current();
-    Sun.render();
+        ms.scale(Sun.radius);
+        ms.translate(0,0,0);
+        Sun.MV = ms.current();
+        Sun.render();
     ms.pop();
     ms.push();
-    ms.rotate(time, [0,0,1]);
-    ms.translate(Earth.orbit,0,0);
+        ms.rotate(time, [0,0,1]);
+        ms.translate(Earth.orbit,0,0);
+        ms.push();
+            ms.scale(Earth.radius);
+            Earth.MV = ms.current();
+            Earth.render();
+        ms.pop();
+        ms.rotate(time*5, [0,0,1]);
+        ms.translate(Moon.orbit,0,0);
+        ms.scale(Moon.radius);
+        Moon.MV = ms.current();
+        Moon.render();
+    ms.pop();
+    ms.rotate(time/5, [0,0,1]);
+    ms.translate(Saturn.orbit,0,0);
     ms.push();
-    ms.scale(Earth.radius);
-    Earth.MV = ms.current();
-    Earth.render();
+        ms.scale(Saturn.radius);
+        Saturn.MV = ms.current();
+        Saturn.render();
     ms.pop();
-    ms.rotate(time*5, [0,0,1]);
-    ms.translate(Moon.orbit,0,0);
-    ms.scale(Moon.radius);
-    Moon.MV = ms.current();
-    Moon.render();
-    ms.pop();
+    ms.scale(SaturnRing.radius);
+    SaturnRing.MV=ms.current();
+    SaturnRing.render();
+
 
     requestAnimationFrame(render);
 }
