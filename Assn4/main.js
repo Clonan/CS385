@@ -35,7 +35,7 @@ function init() {
     D=2*Earth.orbit+Moon.orbit+Saturn.radius+Saturn.orbit;
     near=D*4;
     far=near+D;
-    fov=2/Math.tan(Math.atan((D/2)/(near+D/2)));
+    fov=2/Math.sin(Math.asin(((D/2)/(near+D/2))));
     aspect=1;
     Sun.P = perspective(fov,1,near,far);
     Earth.P = perspective(fov,1,near,far);
@@ -58,7 +58,6 @@ function render() {
     ms = new MatrixStack();
     var V = translate(0, 0, -0.5*(near+far));
     ms.load(V);
-
     ms.push();
         ms.scale(Sun.radius);
         ms.translate(0,0,0);
