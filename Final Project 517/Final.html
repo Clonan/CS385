@@ -69,7 +69,7 @@
     // Just like a color, you'd want to send texture coordinates to
     //   the fragment shader.  Something like 
     //
-     out vec2 vTexCoord;
+    out vec2 vTexCoord;
     //
     //   should do nicely
 
@@ -127,21 +127,22 @@
     // In here, you'd need an "in" variable to receive the iterated
     //  texture coordinates
     //
-    //   in vec2  vTexCoord
+    in vec2  vTexCoord
     //
     //   would again work well, I think.
 
+    uniform sampler2D tex;
     //  Also, you'd need to add in your texture sampler
 
     void main()
     {
         const vec4 red = vec4(1, 0, 0, 1);
         const vec4 blue = vec4(0, 0, 1, 1);
-        fColor = gl_FrontFacing ? blue : red;
+        fColor = texture(tex, vTexCoord);
         // Replace the above line with the texture sampling routine
         //   and you should be pretty close.
         // Comment the following line to verify face winding
-        fColor = vec4(vColor, 1.0);
+        //fColor = vec4(vColor, 1.0);
     }
 </script>
 
