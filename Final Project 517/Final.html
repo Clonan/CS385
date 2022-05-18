@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<script src="initShaders.js"></script>
+<script type="text/javascript" src="Rabbit.js"></script>
+<script type="text/javascript" src="Dragon.js"></script>
+<script type="text/javascript" src="Cube.js"></script>
+<script src="MV.js"></script>
+<script src="MatrixStack.js"></script>
+<script type="text/javascript" src="Cone.js"></script>
+<script src="Sphere.js"></script>
+<script type="text/javascript" src="Cube.js"></script>
+<script src="Disk.js"></script>
+<script src="main.js"></script>
+
+<script id="Cone-vertex-shader" type="x-shader/x-vertex">#version 300 es
+    in  vec4 aPosition;
+    
+    uniform mat4 P;
+    uniform mat4 MV;
+
+    void main()
+    {
+        gl_PointSize = 3.0;
+        gl_Position = P * MV * aPosition;
+    }
+</script>
+
+<script id="Cone-fragment-shader" type="x-shader/x-fragment">#version 300 es
+    precision highp float;
+
+    out vec4 fColor;
+
+    void main()
+    {
+        fColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+</script>
+
+<script id="Misc-vertex-shader" type="x-shader/x-vertex">#version 300 es
+    in vec4 aPosition;
+    
+    uniform mat4 MV;
+    uniform mat4 P;
+
+    void main()
+    {
+        gl_PointSize = 3.0;
+        gl_Position = P * MV * aPosition;
+    }
+</script>
+
+<script id="Misc-fragment-shader" type="x-shader/x-fragment">#version 300 es
+    precision highp float;
+
+    out vec4 fColor;
+
+    uniform vec4 color;
+
+    void main()
+    {
+        fColor = color;
+    }
+</script>
+
+<script id="Cube-vertex-shader" type="x-shader/x-vertex">
+    out vec3    vColor;
+    // Just like a color, you'd want to send texture coordinates to
+    //   the fragment shader.  Something like 
+    //
+     out vec2 vTexCoord;
+    //
+    //   should do nicely
+
+    uniform mat4 P;
+    uniform mat4 MV;
+    
+    // Note: these look curiously close to texture coordinates that
+    //   span a face of a square.
+    const vec2 c[] = vec2[4] (
+        vec2(0, 0),
+        vec2(1, 0),
+        vec2(1, 1),
+        vec2(0, 1)
+    );
+
+    void main()
+    {
+        vec4 pos = vec4(0, 0, 0, 1);
+
+        // x == 0, y == 1, z == 2
+        int axis = int(gl_InstanceID / 2);
+        
+        bool face = bool(gl_InstanceID % 2);
+        pos[axis] = float(face);
+        
+        vec2 p = c[gl_VertexID];
+        p = face ? p.xy : p.yx;
+
+        switch(axis) {
+            case 0:  // X axis
+                pos.yz = p;
+                break;
+
+            case 1:  // Y axis
+                pos.zx = p;
+                break;
+
+            case 2:  // Z axis
+                pos.xy = p;
+                break;
+        }
+
+        vColor = vec3(pos);
+        // You could think about setting the vertex texture coord here
+
+        pos.xyz -= 0.5;
+
+        gl_PointSize = 4.0;
+        gl_Position = P * MV * pos;
+    }
+</script>
+<script id="Cube-fragment-shader" type="x-shader/x-fragment">
+    in vec3 vColor;
+    out vec4 fColor;
+    // In here, you'd need an "in" variable to receive the iterated
+    //  texture coordinates
+    //
+    //   in vec2  vTexCoord
+    //
+    //   would again work well, I think.
+
+    //  Also, you'd need to add in your texture sampler
+
+    void main()
+    {
+        const vec4 red = vec4(1, 0, 0, 1);
+        const vec4 blue = vec4(0, 0, 1, 1);
+        fColor = gl_FrontFacing ? blue : red;
+        // Replace the above line with the texture sampling routine
+        //   and you should be pretty close.
+        // Comment the following line to verify face winding
+        fColor = vec4(vColor, 1.0);
+    }
+</script>
+
+<script id="Sphere-vertex-shader" type="x-shader/x-vertex">
+    in  vec4 aPosition;
+    
+    uniform mat4 P;
+    uniform mat4 MV;
+
+    void main()
+    {
+        gl_PointSize = 3.0;
+        gl_Position = P * MV * aPosition;
+    }
+</script>
+<script id="Sphere-fragment-shader" type="x-shader/x-fragment">
+    out vec4 fColor;
+
+    uniform vec4  color;
+
+    void main()
+    {
+        fColor = color;
+    }
+</script>
+<script id="Disk-vertex-shader" type="x-shader/x-vertex">
+    in  vec4 aPosition;
+    
+    uniform mat4 P;
+    uniform mat4 MV;
+
+    void main()
+    {
+        gl_PointSize = 3.0;
+        gl_Position = P * MV * aPosition;
+    }
+</script>
+<script id="Disk-fragment-shader" type="x-shader/x-fragment">
+    out vec4 fColor;
+
+    uniform vec4  color;
+
+    void main()
+    {
+        fColor = color;
+    }
+</script>
+<canvas id="webgl-canvas" width="800" height="800"></canvas>
