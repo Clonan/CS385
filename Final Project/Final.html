@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <script src="initShaders.js"></script>
 <script type="text/javascript" src="Rabbit.js"></script>
 <script type="text/javascript" src="Dragon.js"></script>
@@ -35,7 +38,7 @@
     }
 </script>
 
-<script id="Cube-vertex-shader" type="x-shader/x-vertex">#version 300 es
+<script id="Misc-vertex-shader" type="x-shader/x-vertex">#version 300 es
     in vec4 aPosition;
     
     uniform mat4 MV;
@@ -48,7 +51,7 @@
     }
 </script>
 
-<script id="Cube-fragment-shader" type="x-shader/x-fragment">#version 300 es
+<script id="Misc-fragment-shader" type="x-shader/x-fragment">#version 300 es
     precision highp float;
 
     out vec4 fColor;
@@ -58,6 +61,87 @@
     void main()
     {
         fColor = color;
+    }
+</script>
+
+<script id="Cube-vertex-shader" type="x-shader/x-vertex">
+    out vec3    vColor;
+    // Just like a color, you'd want to send texture coordinates to
+    //   the fragment shader.  Something like 
+    //
+    out vec2 vTexCoord;
+    //
+    //   should do nicely
+
+    uniform mat4 P;
+    uniform mat4 MV;
+    
+    // Note: these look curiously close to texture coordinates that
+    //   span a face of a square.
+    const vec2 c[] = vec2[4] (
+        vec2(0, 0),
+        vec2(1, 0),
+        vec2(1, 1),
+        vec2(0, 1)
+    );
+
+    void main()
+    {
+        vec4 pos = vec4(0, 0, 0, 1);
+
+        // x == 0, y == 1, z == 2
+        int axis = int(gl_InstanceID / 2);
+        
+        bool face = bool(gl_InstanceID % 2);
+        pos[axis] = float(face);
+        
+        vec2 p = c[gl_VertexID];
+        p = face ? p.xy : p.yx;
+
+        switch(axis) {
+            case 0:  // X axis
+                pos.yz = p;
+                break;
+
+            case 1:  // Y axis
+                pos.zx = p;
+                break;
+
+            case 2:  // Z axis
+                pos.xy = p;
+                break;
+        }
+
+        vColor = vec3(pos);
+        vTexCoord = c[gl_VertexID];
+        // You could think about setting the vertex texture coord here
+
+        pos.xyz -= 0.5;
+
+        gl_PointSize = 4.0;
+        gl_Position = P * MV * pos;
+    }
+</script>
+<script id="Cube-fragment-shader" type="x-shader/x-fragment">
+    in vec3 vColor;
+    out vec4 fColor;
+    // In here, you'd need an "in" variable to receive the iterated
+    //  texture coordinates
+    //
+    in vec2  vTexCoord;
+    //
+    //   would again work well, I think.
+
+    uniform sampler2D tex;
+    //  Also, you'd need to add in your texture sampler
+
+    void main()
+    {
+        fColor = texture(tex, vTexCoord);
+        // Replace the above line with the texture sampling routine
+        //   and you should be pretty close.
+        // Comment the following line to verify face winding
+        //fColor = vec4(vColor, 1.0);
     }
 </script>
 

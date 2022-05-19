@@ -1,7 +1,7 @@
 function Rabbit( gl, vertexShaderId, fragmentShaderId ) {
     
-    var vertShdr = vertexShaderId || "Cube-vertex-shader";
-    var fragShdr = fragmentShaderId || "Cube-fragment-shader";
+    var vertShdr = vertexShaderId || "Misc-vertex-shader";
+    var fragShdr = fragmentShaderId || "Misc-fragment-shader";
 
     this.program = initShaders(gl, vertShdr, fragShdr);
 

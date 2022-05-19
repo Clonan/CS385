@@ -67,10 +67,8 @@ function init() {
 
 
     cube = new Cube(gl);
-    cuber = new Cube(gl);
-    cuber.color=[0,1,0,1];
+    cuber = new Dragon(gl);
     rabbit = new Rabbit(gl);
-    rabbit.color=[0.8,0.6,0.4,1];
     canvas.addEventListener("click", onClick, false);
 
     requestAnimationFrame(render);
@@ -147,13 +145,13 @@ function render() {
     ms.pop();
 
     ms.push();
-        ms.translate(-0.5+CenterXPos, -0.5+CenterYPos, 0);
-        ms.scale(0.1);
+        ms.translate(-0.5+CenterXPos, -0.6+CenterYPos, 0);
         if(zoomed==1&&zoomTarget==4||shrinking4) {
             ms.scale(zoomScale);
+            ms.translate(0,-0.015*zoomScale,0);
             shrinking4=1;
         }
-        ms.rotate(cuberAngle, [1, 1.2, 1.4]);
+        ms.rotate(cuberAngle, [0, 1, 0]);
         cuber.MV=ms.current();
         cuber.render();
     ms.pop();
@@ -162,6 +160,7 @@ function render() {
         ms.translate(-0.5+CenterXPos, 0.4+CenterYPos, 0);
         if(zoomed==1&&zoomTarget==3||shrinking3) {
             ms.scale(zoomScale);
+            ms.translate(0,-0.015*zoomScale,0);
             shrinking3=1;
         }
         ms.scale(1);
@@ -243,6 +242,27 @@ function onClick(ev, gl, canvas) {
         zoomed=0;
         zoomTarget=0;
     }
+}
+function initTexture () { 
+    texture = gl.createTexture(); 
+    texImage = new Image(); 
+    texImage.onload = function () { 
+        loadTexture(texImage, texture); 
+    }; 
+    texImage.src = "Dirt.png"; 
+}
+
+function loadTexture(image, texture) { 
+    gl.bindTexture(gl.TEXTURE_2D, texture); 
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,  
+        gl.RGBA, gl.UNSIGNED_BYTE, image); 
+    gl.texParameteri(gl.TEXTURE_2D,    
+        gl.TEXTURE_MAG_FILTER, gl.LINEAR); 
+    gl.texParameteri(gl.TEXTURE_2D, 
+        gl.TEXTURE_MIN_FILTER,  
+        gl.LINEAR_MIPMAP_NEAREST); 
+    gl.generateMipmap(gl.TEXTURE_2D); 
+    // gl.bindTexture(gl.TEXTURE_2D, null); 
 }
 
 window.onload = init;
